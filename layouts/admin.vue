@@ -1,54 +1,60 @@
 <template>
   <div class="c-app">
-    <div class="c-sidebar c-sidebar-dark c-sidebar-fixed c-sidebar-lg-show" id="sidebar">
+    <!-- Sidebar -->
+    <aside class="c-sidebar c-sidebar-dark c-sidebar-fixed c-sidebar-lg-show">
       <div class="c-sidebar-brand d-lg-down-none">
-        <img src="/images/xiaomi.png" class="bg-light rounded shadow-sm p-2" width="35"> <span class="ml-2 font-weight-bold">MI STORE</span>
+        <img
+          src="/images/xiaomi.png"
+          class="bg-light rounded shadow-sm p-2"
+          width="35"
+          alt="MI STORE Logo"
+        />
+        <span class="ml-2 font-weight-bold">{{ brandName }}</span>
       </div>
 
-      <!-- sidebar -->
       <Sidebar />
-      <!-- end sidebar -->
+    </aside>
 
-    </div>
+    <!-- Wrapper -->
     <div class="c-wrapper c-fixed-components">
-      
-      <!-- header -->
       <Header />
-      <!-- end header -->
 
-      <div class="c-body">
-
-        <!-- content -->
+      <main class="c-body">
         <Nuxt />
-        <!-- end content -->
 
+        <!-- Footer -->
         <footer class="c-footer">
-          <div><strong>MI STORE</strong> &copy; 2021 - SantriKoding.com.</div>
-          <div class="ml-auto">Template by&nbsp;<a href="https://coreui.io/">CoreUI</a></div>
+          <div><strong>{{ brandName }}</strong> &copy; {{ currentYear }} - SantriKoding.com.</div>
+          <div class="ml-auto">
+            Template by <a href="https://coreui.io/" target="_blank" rel="noopener">CoreUI</a>
+          </div>
         </footer>
-      </div>
+      </main>
     </div>
   </div>
 </template>
 
 <script>
+import Header from "@/components/admin/header.vue";
+import Sidebar from "@/components/admin/sidebar.vue";
 
-  import Header from '@/components/admin/header.vue'
-  import Sidebar from '@/components/admin/sidebar.vue'
+export default {
+  middleware: "isAdmin",
 
-  export default {
+  components: {
+    Header,
+    Sidebar,
+  },
 
-    //middleware
-    middleware: 'isAdmin',
-
-    //register components
-    components: {
-      Header,
-      Sidebar
-    }
-
-  }
+  data() {
+    return {
+      brandName: "MI STORE",
+      currentYear: new Date().getFullYear(),
+    };
+  },
+};
 </script>
 
-<style>
+<style scoped>
+/* Tambahkan scoped agar tidak mengganggu style global */
 </style>
