@@ -1,19 +1,20 @@
 <template>
   <div class="mr-custom mb-5">
     <div class="fade-in">
-      <!-- slider -->
+      <!-- Slider -->
       <Slider />
-      <!-- end slider -->
+      <!-- End Slider -->
 
-      <!-- product -->
+      <!-- Product Section -->
       <div class="container-fluid mt-4 mb-5">
         <div class="mb-4">
           <h5 class="text-uppercase">
             <i class="fa fa-shopping-bag"></i> PRODUK TERBARU
           </h5>
-          <!-- Solid divider -->
+          <!-- Solid Divider -->
           <hr class="solid" />
         </div>
+
         <div class="row">
           <div
             class="col-md-3 mt-1 mb-4"
@@ -36,8 +37,7 @@
                       }"
                       class="text-default mb-2"
                       data-abc="true"
-                      >{{ product.title }}</nuxt-link
-                    >
+                    >{{ product.title }}</nuxt-link>
                   </h6>
                   <nuxt-link
                     :to="{
@@ -73,32 +73,34 @@
           </div>
         </div>
 
+        <!-- See More Button -->
         <div class="row justify-content-center mt-4">
           <div class="text-center">
             <nuxt-link
               :to="{ name: 'products' }"
               class="btn btn-lg btn-warning border-0 rounded shadow-sm"
-              >LIHAT LEBIH BANYAK</nuxt-link
             >
+              LIHAT LEBIH BANYAK
+            </nuxt-link>
           </div>
         </div>
       </div>
-      <!-- end product -->
+      <!-- End Product Section -->
     </div>
   </div>
 </template>
 
 <script>
-//import slider
+// Import Slider Component
 import Slider from "@/components/web/slider.vue";
 
 export default {
-  //register components
+  // Register Components
   components: {
     Slider,
   },
 
-  //meta
+  // Meta Configuration
   head() {
     return {
       title: "MI STORE - Distributor Xiaomi Indonesia Resmi",
@@ -127,19 +129,52 @@ export default {
     };
   },
 
-  //hook "asyncData"
+  // Fetch Data Asynchronously
   async asyncData({ store }) {
     await store.dispatch("web/product/getProductsData");
   },
 
-  //computed
+  // Computed Properties
   computed: {
-    //products
     products() {
       return this.$store.state.web.product.products;
+    },
+  },
+
+  // Methods for Formatting Price and Calculating Discounts
+  methods: {
+    formatPrice(value) {
+      return Number(value).toLocaleString("id-ID");
+    },
+
+    calculateDiscount(product) {
+      const price = Number(product.price);
+      const discount = Number(product.discount);
+      return price - (price * discount) / 100;
     },
   },
 };
 </script>
 
-<style></style>
+<style scoped>
+.mr-custom {
+  margin-right: 2rem;
+  margin-left: 2rem;
+}
+
+hr.solid {
+  border-top: 2px solid #bbb;
+}
+
+.bg-light-custom {
+  background-color: #f8f9fa;
+}
+
+.text-red {
+  color: red;
+}
+
+.text-success {
+  color: green;
+}
+</style>
