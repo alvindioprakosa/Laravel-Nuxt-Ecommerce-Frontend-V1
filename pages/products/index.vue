@@ -10,35 +10,35 @@
           <div class="card h-100 border-0 rounded shadow-sm">
             <div class="card-body">
               <div class="card-img-actions">
-                <img :src="product.image" class="card-img img-fluid" />
+                <img
+                  :src="product.image"
+                  class="card-img img-fluid"
+                  alt="Gambar {{ product.title }}"
+                />
               </div>
             </div>
             <div class="card-body bg-light-custom text-center rounded-bottom">
               <div class="mb-2">
                 <h6 class="font-weight-semibold mb-2">
                   <nuxt-link
-                    :to="{
-                      name: 'products-slug',
-                      params: { slug: product.slug },
-                    }"
+                    :to="{ name: 'products-slug', params: { slug: product.slug } }"
                     class="text-default mb-2"
                     data-abc="true"
-                    >{{ product.title }}</nuxt-link
                   >
+                    {{ product.title }}
+                  </nuxt-link>
                 </h6>
                 <nuxt-link
-                  :to="{
-                    name: 'categories-slug',
-                    params: { slug: product.category.slug },
-                  }"
+                  :to="{ name: 'categories-slug', params: { slug: product.category.slug } }"
                   class="text-muted"
                   data-abc="true"
-                  >{{ product.category.name }}</nuxt-link
                 >
+                  {{ product.category.name }}
+                </nuxt-link>
               </div>
               <h6 class="mb-0 font-weight-semibold">
-                <s class="text-red">Rp. {{ formatPrice(product.price) }}</s> /
-                <strong>{{ product.discount }} %</strong>
+                <s class="text-danger">Rp. {{ formatPrice(product.price) }}</s> /
+                <strong>{{ product.discount }}%</strong>
               </h6>
               <h5 class="mb-0 font-weight-semibold mt-3 text-success">
                 Rp. {{ formatPrice(calculateDiscount(product)) }}
@@ -46,13 +46,13 @@
               <hr />
               <client-only>
                 <vue-star-rating
-                  :rating="parseFloat(product.reviews_avg_rating)"
+                  :rating="parseFloat(product.reviews_avg_rating || 0)"
                   :increment="0.5"
                   :star-size="20"
                   :read-only="true"
                   :show-rating="false"
                   :inline="true"
-                ></vue-star-rating>
+                />
                 (<strong>{{ product.reviews_count }}</strong> ulasan)
               </client-only>
             </div>
@@ -69,8 +69,7 @@
             :total-rows="products.total"
             :per-page="products.per_page"
             @change="changePage"
-            aria-controls="my-table"
-          ></b-pagination>
+          />
         </div>
       </div>
     </div>
@@ -79,7 +78,10 @@
 
 <script>
 export default {
-  //meta
+  async asyncData({ store }) {
+    await store.dispatch("web/product/getProductsData");
+  },
+
   head() {
     return {
       title: "Products - MI STORE - Distributor Xiaomi Indonesia Resmi",
@@ -92,7 +94,7 @@ export default {
         {
           hid: "og:site_name",
           name: "og:site_name",
-          content: "Products - MI STORE - Distributor Xiaomi Indonesia Resmi",
+          content: "MI STORE Indonesia",
         },
         {
           hid: "og:image",
@@ -108,31 +110,43 @@ export default {
     };
   },
 
-  //hook "asyncData"
-  async asyncData({ store }) {
-    await store.dispatch("web/product/getProductsData");
-  },
-
-  //computed
   computed: {
-    //products
     products() {
-      return this.$store.state.web.product.products;
+      return this.$store.state.web.product.products || {
+        data: [],
+        current_page: 1,
+        total: 0,
+        per_page: 12,
+      };
     },
   },
 
-  //method
   methods: {
-    //method "changePage"
+    formatPrice(value) {
+      if (!value) return "0";
+      return Number(value).toLocaleString("id-ID");
+    },
+    calculateDiscount(product) {
+      const discount = (product.price * product.discount) / 100;
+      return product.price - discount;
+    },
     changePage(page) {
-      //commit to mutation "SET_PAGE"
       this.$store.commit("web/product/SET_PAGE", page);
-
-      //dispatch on action "getProductsData"
       this.$store.dispatch("web/product/getProductsData");
     },
   },
 };
 </script>
 
-<style></style>
+<style scoped>
+.mt-custom {
+  margin-top: 80px;
+}
+.card-img {
+  max-height: 200px;
+  object-fit: contain;
+}
+.bg-light-custom {
+  background-color: #f9f9f9;
+}
+</style>
