@@ -4,9 +4,9 @@
       <div class="row">
         <div class="col-md-12">
           <h3>
-            PENCARIAN DENGAN KATA KUNCI : <strong>{{ $route.query.q }}</strong>
+            PENCARIAN DENGAN KATA KUNCI :
+            <strong>{{ $route.query.q }}</strong>
           </h3>
-          <!-- Solid divider -->
           <hr class="solid" />
         </div>
       </div>
@@ -20,7 +20,12 @@
           <div class="card h-100 border-0 rounded shadow-sm">
             <div class="card-body">
               <div class="card-img-actions">
-                <img :src="product.image" class="card-img img-fluid" />
+                <img
+                  :src="product.image"
+                  class="card-img img-fluid"
+                  loading="lazy"
+                  :alt="product.title"
+                />
               </div>
             </div>
             <div class="card-body bg-light-custom text-center rounded-bottom">
@@ -48,7 +53,7 @@
               </div>
               <h6 class="mb-0 font-weight-semibold">
                 <s class="text-red">Rp. {{ formatPrice(product.price) }}</s> /
-                <strong>{{ product.discount }} %</strong>
+                <strong>{{ product.discount }}%</strong>
               </h6>
               <h5 class="mb-0 font-weight-semibold mt-3 text-success">
                 Rp. {{ formatPrice(calculateDiscount(product)) }}
@@ -62,7 +67,7 @@
                   :read-only="true"
                   :show-rating="false"
                   :inline="true"
-                ></vue-star-rating>
+                />
                 (<strong>{{ product.reviews_count }}</strong> ulasan)
               </client-only>
             </div>
@@ -76,7 +81,6 @@
         </div>
       </div>
 
-      <!--pagination -->
       <div class="row justify-content-center mt-4 mb-4">
         <div class="text-center">
           <b-pagination
@@ -85,8 +89,8 @@
             :total-rows="products.total"
             :per-page="products.per_page"
             @change="changePage"
-            aria-controls="my-table"
-          ></b-pagination>
+            aria-controls="product-pagination"
+          />
         </div>
       </div>
     </div>
@@ -95,41 +99,65 @@
 
 <script>
 export default {
-  //meta
   head() {
+    const keyword = this.$route.query.q || "Pencarian";
     return {
-      title: `Pencarian untuk : ${this.$route.query.q} - MI STORE - Distributor Xiaomi Indonesia Resmi`,
+      title: `Pencarian untuk : ${keyword} - MI STORE - Distributor Xiaomi Indonesia Resmi`,
+      meta: [
+        {
+          hid: "description",
+          name: "description",
+          content: `Temukan produk Xiaomi terbaik dengan kata kunci "${keyword}" hanya di MI STORE Indonesia.`,
+        },
+      ],
     };
   },
 
-  //watch query URL
   watchQuery: ["q"],
 
-  //hook "asyncData"
   async asyncData({ store, query }) {
     await store.dispatch("web/product/getProductsData", query.q);
   },
 
-  //computed
   computed: {
-    //products
     products() {
       return this.$store.state.web.product.products;
     },
   },
 
-  //method
   methods: {
-    //method "changePage"
     changePage(page) {
-      //commit to mutation "SET_PAGE"
       this.$store.commit("web/product/SET_PAGE", page);
+      this.$store.dispatch(
+        "web/product/getProductsData",
+        this.$route.query.q
+      );
+    },
 
-      //dispatch on action "getProductsData"
-      this.$store.dispatch("web/product/getProductsData", this.$route.query.q);
+    formatPrice(value) {
+      return Number(value).toLocaleString("id-ID");
+    },
+
+    calculateDiscount(product) {
+      const price = Number(product.price);
+      const discount = Number(product.discount);
+      return price - (price * discount) / 100;
     },
   },
 };
 </script>
 
-<style></style>
+<style scoped>
+.mt-custom {
+  margin-top: 2rem;
+}
+hr.solid {
+  border-top: 2px solid #bbb;
+}
+.text-red {
+  color: red;
+}
+.bg-light-custom {
+  background-color: #f8f9fa;
+}
+</style>
